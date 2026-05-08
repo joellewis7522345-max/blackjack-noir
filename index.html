@@ -1879,10 +1879,41 @@
             showMessage("Copy failed. Browser blocked clipboard access.");
           }
         });
+        let cornerTaps = 0;
+        window.addEventListener("pointerdown", (event) => {
+          if (event.clientX > 54 || event.clientY > 54) {
+            cornerTaps = 0;
+            return;
+          }
+          cornerTaps += 1;
+          window.setTimeout(() => {
+            cornerTaps = Math.max(0, cornerTaps - 1);
+          }, 1200);
+          if (cornerTaps >= 5) {
+            cornerTaps = 0;
+            updateSetting("cleanMode", false);
+            showMessage("Clean mode off.");
+          }
+        });
+      }
+
+      function applyUrlOverrides() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("clean") === "off") {
+          state.settings.cleanMode = false;
+          saveGame();
+        }
+        if (params.has("reset-ui")) {
+          state.settings.cleanMode = false;
+          state.settings.theme = "apple";
+          state.settings.vegasRules = false;
+          saveGame();
+        }
       }
 
       function boot() {
         loadSave();
+        applyUrlOverrides();
         createShoe();
         syncSettingsInputs();
         bindEvents();
