@@ -15,7 +15,10 @@ Enable Pages for the `main` branch from the repository settings. The app opens f
 - Vegas Rules can be enabled in settings for double/split.
 - Clean Mode hides chrome and leaves the table.
 - Session Only avoids persistent saves on shared/school devices.
+- Lite Mode reduces visual effects for older/school laptops.
+- Density controls make the table fit better on small screens.
+- Force Update clears the PWA cache if a home-screen app looks stale.
 
 ## Saves
 
-The app autosaves locally unless Session Only is enabled. Settings include New Session and Privacy Wipe controls.
+The app autosaves locally unless Session Only is enabled. Settings include New Session, Reset UI, Force Update, and Privacy Wipe controls.

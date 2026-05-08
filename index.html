@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
+      --app-version: "2.0.0";
       --bg: #050604;
       --felt: #082816;
       --felt2: #0e3a22;
@@ -32,6 +33,24 @@
       --title: "Cinzel", "Playfair Display", Georgia, serif;
       --card-w: clamp(64px, 8.6vw, 108px);
       --card-h: calc(var(--card-w) * 1.42);
+    }
+    body.density-comfortable { --card-w: clamp(64px, 8.6vw, 108px); }
+    body.density-compact { --card-w: clamp(56px, 7.2vw, 86px); }
+    body.density-tiny { --card-w: clamp(46px, 6vw, 68px); }
+    body.lite-mode * {
+      animation-duration: .01ms !important;
+      transition-duration: .01ms !important;
+      backdrop-filter: none !important;
+    }
+    body.lite-mode .card-face,
+    body.lite-mode .card-back,
+    body.lite-mode .table,
+    body.lite-mode .controls,
+    body.lite-mode .side-panel {
+      box-shadow: none !important;
+    }
+    body.lite-mode .table {
+      background: linear-gradient(135deg, #0b2415, #111);
     }
     body.theme-realistic {
       --felt: #0b311b;
@@ -377,6 +396,15 @@
       border-radius: 34px;
       box-shadow: 0 18px 70px rgba(0,0,0,.34);
     }
+    body.density-compact .controls,
+    body.density-tiny .controls {
+      padding: 10px;
+      gap: 8px;
+    }
+    body.density-tiny button {
+      min-height: 40px;
+      padding: .45rem .68rem;
+    }
     .quick-bets {
       display: flex;
       gap: 8px;
@@ -614,6 +642,16 @@
       padding: .75rem;
       margin: 10px 0;
     }
+    .help-box {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .78rem;
+      line-height: 1.45;
+      border: 1px solid rgba(201,168,76,.16);
+      background: rgba(255,255,255,.03);
+      padding: .75rem;
+      margin: 10px 0;
+    }
     .setting small {
       color: var(--muted);
       font-family: var(--mono);
@@ -720,7 +758,11 @@
       .bank { grid-column: 1 / -1; text-align: left; }
       .table { min-height: calc(100vh - 150px); }
       .hand-row { gap: 4px; }
-      .controls { grid-template-columns: 1fr; }
+      .controls {
+        position: sticky;
+        bottom: max(8px, env(safe-area-inset-bottom));
+        grid-template-columns: 1fr;
+      }
       .actions button, .betting button { flex: 1 1 44%; }
       .chip { width: 64px; height: 64px; }
     }
@@ -835,12 +877,25 @@
     <label class="setting">Clean mode <input id="cleanToggle" type="checkbox"></label>
     <label class="setting">Vegas rules <input id="vegasToggle" type="checkbox"></label>
     <label class="setting">Session only <input id="sessionToggle" type="checkbox"></label>
+    <label class="setting">Lite mode <input id="liteToggle" type="checkbox"></label>
+    <label class="setting">Auto repeat bet <input id="autoRepeatToggle" type="checkbox"></label>
     <label class="setting">Theme
       <select id="themeSelect">
         <option value="apple">Apple noir</option>
         <option value="realistic">Realistic table</option>
       </select>
     </label>
+    <label class="setting">Density
+      <select id="densitySelect">
+        <option value="comfortable">Comfortable</option>
+        <option value="compact">Compact</option>
+        <option value="tiny">Tiny</option>
+      </select>
+    </label>
+    <div class="help-box">
+      <strong>Offline / school Wi-Fi:</strong> use Download HTML for a one-file copy. Use Force Update if the home-screen app looks stale. Session Only avoids saving progress on shared devices.
+    </div>
+    <div class="help-box" id="versionBox">Version loading...</div>
     <div class="sync-note">
       Saves are local to this browser. Use reset if you want a fresh run.
     </div>
@@ -849,6 +904,8 @@
       <button id="importBtn" class="sync-action">Import Save</button>
       <button id="dataUrlBtn">Copy Data URL</button>
       <button id="downloadHtmlBtn">Download HTML</button>
+      <button id="forceUpdateBtn">Force Update</button>
+      <button id="resetUiBtn">Reset UI</button>
       <button id="resetStatsBtn">Reset Stats</button>
       <button id="newSessionBtn">New Session</button>
       <button id="privacyWipeBtn">Privacy Wipe</button>
@@ -889,6 +946,8 @@
       "use strict";
 
       const STORAGE_KEY = "blackjack-noir-save-v1";
+      const APP_VERSION = "2.0.0";
+      const CACHE_VERSION = "blackjack-noir-v5";
       const STARTING_BALANCE = 1000;
       const RESULT_DELAY_MS = 2000;
       const SUITS = ["♠", "♥", "♦", "♣"];
@@ -935,12 +994,18 @@
         cleanToggle: document.getElementById("cleanToggle"),
         vegasToggle: document.getElementById("vegasToggle"),
         sessionToggle: document.getElementById("sessionToggle"),
+        liteToggle: document.getElementById("liteToggle"),
+        autoRepeatToggle: document.getElementById("autoRepeatToggle"),
         themeSelect: document.getElementById("themeSelect"),
+        densitySelect: document.getElementById("densitySelect"),
+        versionBox: document.getElementById("versionBox"),
         exportBtn: document.getElementById("exportBtn"),
         importBtn: document.getElementById("importBtn"),
         resetStatsBtn: document.getElementById("resetStatsBtn"),
         newSessionBtn: document.getElementById("newSessionBtn"),
         privacyWipeBtn: document.getElementById("privacyWipeBtn"),
+        forceUpdateBtn: document.getElementById("forceUpdateBtn"),
+        resetUiBtn: document.getElementById("resetUiBtn"),
         dataUrlBtn: document.getElementById("dataUrlBtn"),
         downloadHtmlBtn: document.getElementById("downloadHtmlBtn"),
         installNote: document.getElementById("installNote"),
@@ -985,7 +1050,10 @@
         cleanMode: false,
         vegasRules: false,
         sessionOnly: false,
-        theme: "apple"
+        liteMode: false,
+        autoRepeatBet: false,
+        theme: "apple",
+        density: "comfortable"
       });
 
       const state = {
@@ -1333,8 +1401,12 @@
 
       function applyVisualSettings() {
         document.body.classList.toggle("clean-mode", state.settings.cleanMode);
+        document.body.classList.toggle("lite-mode", state.settings.liteMode);
         document.body.classList.toggle("theme-realistic", state.settings.theme === "realistic");
         document.body.classList.toggle("theme-apple", state.settings.theme === "apple");
+        document.body.classList.toggle("density-comfortable", state.settings.density === "comfortable");
+        document.body.classList.toggle("density-compact", state.settings.density === "compact");
+        document.body.classList.toggle("density-tiny", state.settings.density === "tiny");
       }
 
       function render() {
@@ -1345,7 +1417,13 @@
         renderBadges();
         renderChipStack();
         applyVisualSettings();
+        renderVersionBox();
         syncSettingsInputs(false);
+      }
+
+      function renderVersionBox() {
+        const mode = state.settings.sessionOnly ? "session only" : "local autosave";
+        els.versionBox.textContent = `Version ${APP_VERSION} / Cache ${CACHE_VERSION} / ${mode}`;
       }
 
       function syncSettingsInputs(read = true) {
@@ -1357,7 +1435,10 @@
           els.cleanToggle.checked = state.settings.cleanMode;
           els.vegasToggle.checked = state.settings.vegasRules;
           els.sessionToggle.checked = state.settings.sessionOnly;
+          els.liteToggle.checked = state.settings.liteMode;
+          els.autoRepeatToggle.checked = state.settings.autoRepeatBet;
           els.themeSelect.value = state.settings.theme;
+          els.densitySelect.value = state.settings.density;
         } else {
           els.countToggle.checked = state.settings.showCount;
           els.autoStandToggle.checked = state.settings.autoStand;
@@ -1366,7 +1447,10 @@
           els.cleanToggle.checked = state.settings.cleanMode;
           els.vegasToggle.checked = state.settings.vegasRules;
           els.sessionToggle.checked = state.settings.sessionOnly;
+          els.liteToggle.checked = state.settings.liteMode;
+          els.autoRepeatToggle.checked = state.settings.autoRepeatBet;
           els.themeSelect.value = state.settings.theme;
+          els.densitySelect.value = state.settings.density;
         }
       }
 
@@ -1374,8 +1458,36 @@
         state.settings[key] = value;
         if (key === "decks") createShoe();
         if (key === "sessionOnly" && value) localStorage.removeItem(STORAGE_KEY);
+        if (key === "liteMode" && value) state.settings.sound = false;
         saveGame();
         render();
+      }
+
+      function resetUiSettings() {
+        state.settings.cleanMode = false;
+        state.settings.liteMode = false;
+        state.settings.theme = "apple";
+        state.settings.density = "comfortable";
+        state.settings.vegasRules = false;
+        saveGame();
+        render();
+        showMessage("UI reset.");
+      }
+
+      async function clearCachesAndWorkers() {
+        if ("serviceWorker" in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map((registration) => registration.unregister()));
+        }
+        if ("caches" in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((key) => caches.delete(key)));
+        }
+      }
+
+      async function forceUpdate() {
+        await clearCachesAndWorkers();
+        window.location.href = `${window.location.pathname}?reset-ui&v=${Date.now()}`;
       }
 
       function showMessage(text) {
@@ -1507,7 +1619,7 @@
       }
 
       function downloadCurrentHtml() {
-        const html = `<!doctype html>\n${document.documentElement.outerHTML}`;
+        const html = makeStandaloneHtml();
         const blob = new Blob([html], { type: "text/html" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -1520,9 +1632,18 @@
       }
 
       async function copyDataUrl() {
-        const html = `<!doctype html>\n${document.documentElement.outerHTML}`;
+        const html = makeStandaloneHtml();
         const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
         await navigator.clipboard.writeText(dataUrl);
+      }
+
+      function makeStandaloneHtml() {
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll('link[rel="manifest"], link[rel="preconnect"]').forEach((node) => node.remove());
+        clone.querySelectorAll('script').forEach((script) => {
+          script.textContent = script.textContent.replace("navigator.serviceWorker.register(\"blackjack-sw.js\").catch(() => {});", "/* standalone: no service worker */");
+        });
+        return `<!doctype html>\n${clone.outerHTML}`;
       }
 
       async function checkDealerBlackjackThenContinue() {
@@ -1777,6 +1898,11 @@
           state.dealerHoleHidden = true;
           state.mode = STATES.BETTING;
           maybeReshuffle();
+          if (state.settings.autoRepeatBet && state.lastBet > 0 && state.balance >= state.lastBet) {
+            state.balance -= state.lastBet;
+            state.currentBet = state.lastBet;
+            state.betChips = [state.lastBet];
+          }
           showMessage(state.balance <= 0 ? "Game over." : "Place your bet.");
           saveGame();
           render();
@@ -1809,7 +1935,10 @@
         els.cleanToggle.addEventListener("change", () => updateSetting("cleanMode", els.cleanToggle.checked));
         els.vegasToggle.addEventListener("change", () => updateSetting("vegasRules", els.vegasToggle.checked));
         els.sessionToggle.addEventListener("change", () => updateSetting("sessionOnly", els.sessionToggle.checked));
+        els.liteToggle.addEventListener("change", () => updateSetting("liteMode", els.liteToggle.checked));
+        els.autoRepeatToggle.addEventListener("change", () => updateSetting("autoRepeatBet", els.autoRepeatToggle.checked));
         els.themeSelect.addEventListener("change", () => updateSetting("theme", els.themeSelect.value));
+        els.densitySelect.addEventListener("change", () => updateSetting("density", els.densitySelect.value));
         els.exportBtn.addEventListener("click", () => {
           els.saveModalTitle.textContent = "Export Save";
           els.saveModalText.textContent = "Copy this code onto your other device, then use Import Save there.";
@@ -1878,18 +2007,18 @@
         });
         els.privacyWipeBtn.addEventListener("click", async () => {
           localStorage.removeItem(STORAGE_KEY);
-          if ("caches" in window) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map((key) => caches.delete(key)));
-          }
+          await clearCachesAndWorkers();
           state.balance = STARTING_BALANCE;
           state.currentBet = 0;
           state.betChips = [];
           state.stats = defaultStats();
+          state.settings = defaultSettings();
           render();
-          showMessage("Local data wiped.");
+          window.location.href = `${window.location.pathname}?v=${Date.now()}`;
         });
         els.downloadHtmlBtn.addEventListener("click", downloadCurrentHtml);
+        els.forceUpdateBtn.addEventListener("click", forceUpdate);
+        els.resetUiBtn.addEventListener("click", resetUiSettings);
         els.dataUrlBtn.addEventListener("click", async () => {
           try {
             await copyDataUrl();
@@ -1928,7 +2057,9 @@
         }
         if (params.has("reset-ui")) {
           state.settings.cleanMode = false;
+          state.settings.liteMode = false;
           state.settings.theme = "apple";
+          state.settings.density = "comfortable";
           state.settings.vegasRules = false;
           saveGame();
         }

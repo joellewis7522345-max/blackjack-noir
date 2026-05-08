@@ -10,6 +10,8 @@ Notes:
 - Fonts may fall back if the device has no internet access.
 - Use Settings -> Session Only on shared/school devices.
 - Use Settings -> Download HTML to make a one-file copy.
+- Use Settings -> Lite Mode if the device is slow.
+- Use Settings -> Force Update if the installed app looks old.
 
 iPhone:
 1. Send the extracted folder or zip to your iPhone using iCloud Drive, AirDrop, or Files.
