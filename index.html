@@ -79,6 +79,9 @@
       margin: 0;
       border: 0;
     }
+    body.clean-mode .clean-exit {
+      display: block;
+    }
     button, input, select, textarea { font: inherit; }
     button {
       border: 1px solid rgba(201,168,76,.24);
@@ -620,6 +623,20 @@
       display: none !important;
     }
     .hidden { display: none !important; }
+    .clean-exit {
+      position: fixed;
+      z-index: 120;
+      top: max(10px, env(safe-area-inset-top));
+      left: max(10px, env(safe-area-inset-left));
+      display: none;
+      min-height: 42px;
+      padding: .55rem .85rem;
+      font-family: var(--mono);
+      font-size: .8rem;
+      background: rgba(5,5,5,.72);
+      border-color: rgba(243,216,121,.45);
+      color: var(--gold2);
+    }
     .splash {
       position: fixed;
       inset: 0;
@@ -718,6 +735,7 @@
   </style>
 </head>
 <body>
+  <button id="cleanExitBtn" class="clean-exit">Exit Clean</button>
   <div id="splash" class="splash">
     <div class="splash-card">
       <div class="splash-mark">21</div>
@@ -931,6 +949,7 @@
         allInBtn: document.getElementById("allInBtn"),
         chipStack: document.getElementById("chipStack"),
         splash: document.getElementById("splash"),
+        cleanExitBtn: document.getElementById("cleanExitBtn"),
         modalBackdrop: document.getElementById("modalBackdrop"),
         saveModal: document.getElementById("saveModal"),
         saveModalTitle: document.getElementById("saveModalTitle"),
@@ -1878,6 +1897,10 @@
           } catch {
             showMessage("Copy failed. Browser blocked clipboard access.");
           }
+        });
+        els.cleanExitBtn.addEventListener("click", () => {
+          updateSetting("cleanMode", false);
+          showMessage("Clean mode off.");
         });
         let cornerTaps = 0;
         window.addEventListener("pointerdown", (event) => {
