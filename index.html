@@ -30,7 +30,7 @@
       --mono: "DM Mono", "Courier New", monospace;
       --serif: "Playfair Display", Georgia, serif;
       --title: "Cinzel", "Playfair Display", Georgia, serif;
-      --card-w: clamp(58px, 8vw, 92px);
+      --card-w: clamp(64px, 8.6vw, 108px);
       --card-h: calc(var(--card-w) * 1.42);
     }
     * { box-sizing: border-box; }
@@ -66,9 +66,9 @@
       filter: grayscale(1);
     }
     .app {
-      width: min(1220px, calc(100vw - 24px));
+      width: min(1560px, calc(100vw - 16px));
       margin: 0 auto;
-      padding: max(12px, env(safe-area-inset-top)) 0 18px;
+      padding: max(8px, env(safe-area-inset-top)) 0 12px;
     }
     .topbar {
       display: grid;
@@ -113,9 +113,9 @@
     .icon-btn { min-width: 52px; padding-inline: .75rem; }
     .table {
       position: relative;
-      margin-top: 12px;
-      min-height: 610px;
-      padding: clamp(12px, 2vw, 24px);
+      margin-top: 10px;
+      min-height: calc(100vh - 116px);
+      padding: clamp(12px, 2.4vw, 34px);
       border: 1px solid rgba(201,168,76,.32);
       background:
         radial-gradient(ellipse at center, rgba(24,98,56,.72), rgba(5,22,13,.8) 58%, rgba(0,0,0,.64)),
@@ -126,7 +126,7 @@
     .table::before {
       content: "";
       position: absolute;
-      inset: 18px;
+      inset: clamp(16px, 2vw, 30px);
       border: 1px solid rgba(201,168,76,.28);
       border-radius: 48%;
       pointer-events: none;
@@ -158,12 +158,17 @@
     .hand-row {
       position: relative;
       z-index: 1;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       align-items: center;
+      justify-content: center;
       min-height: calc(var(--card-h) + 62px);
-      margin-bottom: 20px;
+      margin-bottom: clamp(14px, 2.4vh, 28px);
+      text-align: center;
+    }
+    .hand-row:first-of-type {
+      padding-top: clamp(6px, 2vh, 24px);
     }
     .label {
       color: var(--muted);
@@ -173,24 +178,31 @@
       margin-bottom: 8px;
     }
     .score {
-      align-self: start;
-      min-width: 126px;
+      align-self: center;
+      min-width: 154px;
       color: var(--gold2);
       background: rgba(0,0,0,.5);
       border: 1px solid rgba(201,168,76,.25);
       padding: .55rem .7rem;
       text-align: center;
+      order: -1;
+      box-shadow: 0 8px 28px rgba(0,0,0,.22);
     }
     .cards {
       min-height: var(--card-h);
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: clamp(6px, 1vw, 12px);
       flex-wrap: nowrap;
       overflow: visible;
       padding: 4px 0 10px;
+      width: 100%;
     }
     .hand.active-hand .cards { filter: drop-shadow(0 0 18px rgba(201,168,76,.22)); }
+    .hand {
+      width: 100%;
+    }
     .hand.bust { animation: shake .42s ease; }
     .card {
       width: var(--card-w);
@@ -254,7 +266,7 @@
       position: relative;
       z-index: 2;
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(280px, 1fr) minmax(320px, 1fr);
       gap: 12px;
       align-items: end;
       background: rgba(0,0,0,.44);
@@ -262,7 +274,7 @@
       padding: 14px;
       margin-top: 6px;
     }
-    .actions, .betting { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .actions, .betting { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; }
     .bet-display {
       color: var(--gold2);
       font-size: 1.1rem;
@@ -275,6 +287,7 @@
     .chips {
       display: flex;
       gap: 10px;
+      justify-content: center;
       overflow-x: auto;
       padding: 4px 2px 8px;
       scrollbar-color: var(--gold) #111;
@@ -484,16 +497,15 @@
     @media (max-width: 760px) {
       .topbar { grid-template-columns: 1fr auto; }
       .bank { grid-column: 1 / -1; text-align: left; }
-      .table { min-height: 560px; }
-      .hand-row { grid-template-columns: 1fr; gap: 2px; }
-      .score { justify-self: start; }
+      .table { min-height: calc(100vh - 150px); }
+      .hand-row { gap: 4px; }
       .controls { grid-template-columns: 1fr; }
       .actions button, .betting button { flex: 1 1 44%; }
       .chip { width: 64px; height: 64px; }
     }
     @media (max-height: 520px) and (orientation: landscape) {
       :root { --card-w: 50px; }
-      .table { min-height: 420px; padding: 10px; }
+      .table { min-height: calc(100vh - 82px); padding: 10px; }
       .hand-row { min-height: calc(var(--card-h) + 28px); margin-bottom: 4px; }
       .controls { padding: 8px; }
       .chip { width: 52px; height: 52px; }
