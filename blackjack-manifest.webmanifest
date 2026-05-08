@@ -1,0 +1,19 @@
+{
+  "name": "Blackjack Noir",
+  "short_name": "Blackjack",
+  "description": "A polished casino noir Blackjack game with offline play and save-file sync.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#050604",
+  "theme_color": "#050604",
+  "icons": [
+    {
+      "src": "blackjack-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

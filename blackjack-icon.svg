@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="felt" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#145a34"/>
+      <stop offset="58%" stop-color="#082816"/>
+      <stop offset="100%" stop-color="#050604"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f6dc78"/>
+      <stop offset="100%" stop-color="#c9a84c"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity=".55"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="104" fill="#050604"/>
+  <rect x="34" y="34" width="444" height="444" rx="82" fill="url(#felt)" stroke="url(#gold)" stroke-width="10"/>
+  <g filter="url(#shadow)">
+    <rect x="151" y="108" width="150" height="218" rx="18" fill="#f7eedb" transform="rotate(-10 226 217)"/>
+    <rect x="213" y="137" width="150" height="218" rx="18" fill="#f7eedb" transform="rotate(10 288 246)"/>
+  </g>
+  <text x="184" y="193" font-family="Georgia, serif" font-size="72" font-weight="900" fill="#111">A</text>
+  <text x="198" y="263" font-family="Georgia, serif" font-size="78" fill="#111">♠</text>
+  <text x="263" y="224" font-family="Georgia, serif" font-size="72" font-weight="900" fill="#b8302d">K</text>
+  <text x="275" y="294" font-family="Georgia, serif" font-size="78" fill="#b8302d">♥</text>
+  <circle cx="256" cy="378" r="66" fill="url(#gold)" stroke="#080808" stroke-width="12"/>
+  <circle cx="256" cy="378" r="38" fill="#f7eedb" stroke="#080808" stroke-width="4"/>
+  <text x="256" y="391" text-anchor="middle" font-family="Courier New, monospace" font-size="34" font-weight="700" fill="#080808">21</text>
+</svg>
