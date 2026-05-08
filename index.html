@@ -33,6 +33,23 @@
       --card-w: clamp(64px, 8.6vw, 108px);
       --card-h: calc(var(--card-w) * 1.42);
     }
+    body.theme-realistic {
+      --felt: #0b311b;
+      --felt2: #14512e;
+      --panel: rgba(10, 8, 5, .84);
+      --gold: #D0A94F;
+      --gold2: #FFE08A;
+      --cream: #FFF1D2;
+    }
+    body.theme-apple {
+      --felt: #101411;
+      --felt2: #18201b;
+      --panel: rgba(12, 13, 12, .72);
+      --gold: #d9c37a;
+      --gold2: #f2e3a5;
+      --cream: #f5f1e8;
+      --muted: #aaa49a;
+    }
     * { box-sizing: border-box; }
     html, body { min-height: 100%; }
     body {
@@ -46,6 +63,21 @@
         repeating-linear-gradient(90deg, rgba(0,0,0,.12), rgba(0,0,0,.12) 1px, transparent 1px, transparent 7px),
         linear-gradient(135deg, var(--felt), var(--felt2) 42%, #03170d);
       overflow-x: hidden;
+    }
+    body.clean-mode .topbar,
+    body.clean-mode .status-line,
+    body.clean-mode .side-panel,
+    body.clean-mode .install-note {
+      display: none !important;
+    }
+    body.clean-mode .app {
+      width: min(1680px, 100vw);
+      padding: 0;
+    }
+    body.clean-mode .table {
+      min-height: 100vh;
+      margin: 0;
+      border: 0;
     }
     button, input, select, textarea { font: inherit; }
     button {
@@ -131,6 +163,20 @@
       box-shadow: inset 0 0 90px rgba(0,0,0,.78), 0 20px 80px rgba(0,0,0,.45);
       overflow: hidden;
     }
+    .table::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: clamp(84px, 13vh, 140px);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.22)),
+        linear-gradient(90deg, #120c06, #31200f 18%, #0b0704 50%, #31200f 82%, #120c06);
+      border-top: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 -18px 45px rgba(0,0,0,.35), inset 0 8px 14px rgba(255,255,255,.035);
+      pointer-events: none;
+    }
     .table::before {
       content: "";
       position: absolute;
@@ -174,6 +220,35 @@
       min-height: calc(var(--card-h) + 62px);
       margin-bottom: clamp(14px, 2.4vh, 28px);
       text-align: center;
+    }
+    .hand-row.active-zone::before {
+      content: "";
+      position: absolute;
+      width: min(720px, 86vw);
+      height: 190px;
+      background: radial-gradient(ellipse, rgba(243,216,121,.18), transparent 68%);
+      filter: blur(8px);
+      pointer-events: none;
+    }
+    .hand-head {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(255,255,255,.16) 0 22%, transparent 23%),
+        radial-gradient(ellipse at 50% 86%, rgba(255,255,255,.13) 0 36%, transparent 37%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      border: 1px solid rgba(201,168,76,.24);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.1), 0 8px 24px rgba(0,0,0,.24);
     }
     .hand-row:first-of-type {
       padding-top: clamp(6px, 2vh, 24px);
@@ -243,6 +318,7 @@
       color: #101010;
       background:
         radial-gradient(circle at 50% 45%, rgba(255,255,255,.8), transparent 35%),
+        repeating-linear-gradient(22deg, rgba(0,0,0,.018) 0 1px, transparent 1px 6px),
         linear-gradient(160deg, #fff8e9, var(--cream));
       padding: 7px;
       display: grid;
@@ -269,6 +345,19 @@
       font-size: clamp(1.9rem, 4vw, 3.2rem);
       font-family: Georgia, serif;
     }
+    .face-art {
+      place-self: center;
+      width: 62%;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      border: 1px solid currentColor;
+      background: rgba(255,255,255,.28);
+      font-family: var(--title);
+      font-size: clamp(1.4rem, 3vw, 2.6rem);
+      box-shadow: inset 0 0 18px rgba(0,0,0,.08);
+    }
     .red { color: var(--red); }
     .black { color: #121212; }
     .controls {
@@ -282,6 +371,21 @@
       border: 1px solid rgba(201,168,76,.27);
       padding: 14px;
       margin-top: 6px;
+      border-radius: 34px;
+      box-shadow: 0 18px 70px rgba(0,0,0,.34);
+    }
+    .quick-bets {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .quick-bets button {
+      min-height: 38px;
+      padding: .45rem .78rem;
+      font-family: var(--mono);
+      font-size: .78rem;
     }
     .actions, .betting { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; }
     .bet-display {
@@ -304,6 +408,27 @@
       padding: 4px 2px 8px;
       scrollbar-color: var(--gold) #111;
     }
+    .chip-tray {
+      position: relative;
+    }
+    .chip-stack {
+      min-height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .stack-chip {
+      width: 48px;
+      height: 16px;
+      border-radius: 999px;
+      margin-left: -18px;
+      background: linear-gradient(180deg, #f1d779, #9a782c);
+      border: 1px solid rgba(0,0,0,.5);
+      box-shadow: 0 6px 10px rgba(0,0,0,.18);
+      animation: chipStackIn .2s ease both;
+    }
+    .stack-chip:first-child { margin-left: 0; }
     .chip {
       width: 70px;
       height: 70px;
@@ -347,6 +472,9 @@
       color: rgba(0,0,0,.65);
     }
     .chip.bounce { animation: chipBounce .28s ease; }
+    .tap-pulse {
+      animation: tapPulse .28s ease;
+    }
     .status-line {
       position: relative;
       z-index: 2;
@@ -483,10 +611,62 @@
       padding: .75rem;
       margin: 10px 0;
     }
-    .advanced-action, .sync-action, .sync-note, #saveFileInput {
+    .setting small {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .72rem;
+    }
+    .sync-action, .sync-note, #saveFileInput {
       display: none !important;
     }
     .hidden { display: none !important; }
+    .splash {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(201,168,76,.18), transparent 24rem),
+        linear-gradient(135deg, #020302, #11140f);
+      transition: opacity .42s ease, visibility .42s ease;
+    }
+    .splash.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .splash-card {
+      text-align: center;
+      padding: 28px;
+      border: 1px solid rgba(201,168,76,.24);
+      border-radius: 34px;
+      background: rgba(255,255,255,.045);
+      box-shadow: 0 28px 90px rgba(0,0,0,.42);
+    }
+    .splash-mark {
+      width: 92px;
+      height: 92px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, #f1d779, var(--gold));
+      color: #111;
+      font-family: var(--mono);
+      font-size: 2rem;
+      box-shadow: 0 18px 45px rgba(0,0,0,.28);
+    }
+    .splash h2 {
+      margin: 0;
+      font-family: var(--title);
+      letter-spacing: .16em;
+    }
+    .splash p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
     @keyframes deal {
       from { opacity: 0; transform: translate(160px, -140px) rotate(18deg) scale(.72); }
       to { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); }
@@ -496,6 +676,15 @@
       to { transform: rotateY(0) rotateZ(var(--tilt, 0deg)); }
     }
     @keyframes chipBounce { 50% { transform: scale(1.12); } }
+    @keyframes chipStackIn {
+      from { opacity: 0; transform: translateY(8px) scale(.88); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes tapPulse {
+      0% { box-shadow: 0 0 0 rgba(243,216,121,0); }
+      50% { box-shadow: 0 0 0 10px rgba(243,216,121,.08); }
+      100% { box-shadow: 0 0 0 rgba(243,216,121,0); }
+    }
     @keyframes shimmer {
       0%, 100% { box-shadow: none; }
       50% { box-shadow: 0 0 38px rgba(201,168,76,.72); }
@@ -529,6 +718,13 @@
   </style>
 </head>
 <body>
+  <div id="splash" class="splash">
+    <div class="splash-card">
+      <div class="splash-mark">21</div>
+      <h2>BLACKJACK NOIR</h2>
+      <p>casual table loading</p>
+    </div>
+  </div>
   <div class="app">
     <header class="topbar">
       <h1>BLACKJACK</h1>
@@ -550,7 +746,7 @@
 
       <section class="hand-row">
         <div class="hand" id="dealerArea">
-          <div class="label">Dealer Hand</div>
+          <div class="hand-head"><div class="avatar" aria-hidden="true"></div><div class="label">Dealer</div></div>
           <div id="dealerCards" class="cards"></div>
         </div>
         <div id="dealerScore" class="score">Score: ?</div>
@@ -558,7 +754,7 @@
 
       <section class="hand-row">
         <div class="hand active-hand" id="playerArea">
-          <div class="label" id="playerLabel">Player Hand</div>
+          <div class="hand-head"><div class="avatar" aria-hidden="true"></div><div class="label" id="playerLabel">You</div></div>
           <div id="playerCards" class="cards"></div>
         </div>
         <div id="playerScore" class="score">Score: 0</div>
@@ -570,11 +766,17 @@
             <div id="betDisplay" class="bet-display" title="Click to remove last chip">Bet: $0</div>
             <button id="hitBtn">Hit</button>
             <button id="standBtn">Stand</button>
-            <button id="doubleBtn" class="advanced-action">Double</button>
-            <button id="splitBtn" class="advanced-action">Split</button>
+            <button id="doubleBtn" class="vegas-action">Double</button>
+            <button id="splitBtn" class="vegas-action">Split</button>
           </div>
         </div>
-        <div>
+        <div class="chip-tray">
+          <div id="chipStack" class="chip-stack" aria-hidden="true"></div>
+          <div class="quick-bets">
+            <button id="repeatBetBtn">Repeat</button>
+            <button id="halfBetBtn">Half</button>
+            <button id="allInBtn">All In</button>
+          </div>
           <div class="chips" id="chips">
             <div class="chip" data-chip="5"><div class="chip-face"><span class="chip-word">NOIR</span><span class="chip-value">$5</span></div></div>
             <div class="chip" data-chip="25"><div class="chip-face"><span class="chip-word">NOIR</span><span class="chip-value">$25</span></div></div>
@@ -612,13 +814,26 @@
         <option value="6">6</option>
       </select>
     </label>
+    <label class="setting">Clean mode <input id="cleanToggle" type="checkbox"></label>
+    <label class="setting">Vegas rules <input id="vegasToggle" type="checkbox"></label>
+    <label class="setting">Session only <input id="sessionToggle" type="checkbox"></label>
+    <label class="setting">Theme
+      <select id="themeSelect">
+        <option value="apple">Apple noir</option>
+        <option value="realistic">Realistic table</option>
+      </select>
+    </label>
     <div class="sync-note">
       Saves are local to this browser. Use reset if you want a fresh run.
     </div>
     <div class="modal-actions">
       <button id="exportBtn" class="sync-action">Export Save</button>
       <button id="importBtn" class="sync-action">Import Save</button>
+      <button id="dataUrlBtn">Copy Data URL</button>
+      <button id="downloadHtmlBtn">Download HTML</button>
       <button id="resetStatsBtn">Reset Stats</button>
+      <button id="newSessionBtn">New Session</button>
+      <button id="privacyWipeBtn">Privacy Wipe</button>
     </div>
   </aside>
 
@@ -699,10 +914,23 @@
         autoStandToggle: document.getElementById("autoStandToggle"),
         soundToggle: document.getElementById("soundToggle"),
         deckSelect: document.getElementById("deckSelect"),
+        cleanToggle: document.getElementById("cleanToggle"),
+        vegasToggle: document.getElementById("vegasToggle"),
+        sessionToggle: document.getElementById("sessionToggle"),
+        themeSelect: document.getElementById("themeSelect"),
         exportBtn: document.getElementById("exportBtn"),
         importBtn: document.getElementById("importBtn"),
         resetStatsBtn: document.getElementById("resetStatsBtn"),
+        newSessionBtn: document.getElementById("newSessionBtn"),
+        privacyWipeBtn: document.getElementById("privacyWipeBtn"),
+        dataUrlBtn: document.getElementById("dataUrlBtn"),
+        downloadHtmlBtn: document.getElementById("downloadHtmlBtn"),
         installNote: document.getElementById("installNote"),
+        repeatBetBtn: document.getElementById("repeatBetBtn"),
+        halfBetBtn: document.getElementById("halfBetBtn"),
+        allInBtn: document.getElementById("allInBtn"),
+        chipStack: document.getElementById("chipStack"),
+        splash: document.getElementById("splash"),
         modalBackdrop: document.getElementById("modalBackdrop"),
         saveModal: document.getElementById("saveModal"),
         saveModalTitle: document.getElementById("saveModalTitle"),
@@ -734,7 +962,11 @@
         showCount: false,
         autoStand: true,
         sound: true,
-        decks: 6
+        decks: 6,
+        cleanMode: false,
+        vegasRules: false,
+        sessionOnly: false,
+        theme: "apple"
       });
 
       const state = {
@@ -751,6 +983,8 @@
         insuranceBet: 0,
         insuranceResolved: false,
         roundNet: 0,
+        lastBet: 0,
+        lastChipTap: { value: 0, time: 0 },
         stats: defaultStats(),
         settings: defaultSettings(),
         audio: null
@@ -778,6 +1012,7 @@
       }
 
       function saveGame() {
+        if (state.settings.sessionOnly) return;
         const save = createSavePayload();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(save));
       }
@@ -957,12 +1192,15 @@
       function renderCard(card, index, hidden = false, reveal = false) {
         const color = cardColor(card.suit);
         const tilt = ((index % 5) - 2) * 2;
+        const center = ["J", "Q", "K"].includes(card.rank)
+          ? `<div class="face-art">${card.rank}</div>`
+          : `<div class="pip">${card.suit}</div>`;
         return `
           <div class="card ${hidden ? "face-down" : ""} ${reveal ? "reveal" : ""}" style="--i:${index};--tilt:${tilt}deg">
             <div class="card-inner">
               <div class="card-face ${color}">
                 <div class="corner"><span>${card.rank}</span><span>${card.suit}</span></div>
-                <div class="pip">${card.suit}</div>
+                ${center}
                 <div class="corner bottom"><span>${card.rank}</span><span>${card.suit}</span></div>
               </div>
               <div class="card-back"></div>
@@ -971,6 +1209,8 @@
       }
 
       function renderHands() {
+        els.dealerArea.closest(".hand-row").classList.toggle("active-zone", state.mode === STATES.DEALER_TURN);
+        els.playerArea.closest(".hand-row").classList.toggle("active-zone", [STATES.PLAYER_TURN, STATES.SPLIT_TURN].includes(state.mode));
         els.dealerCards.innerHTML = state.dealer.map((card, index) => {
           const hidden = index === 1 && state.dealerHoleHidden;
           return renderCard(card, index, hidden, !hidden && state.mode === STATES.DEALER_TURN && index === 1);
@@ -981,7 +1221,7 @@
 
         if (state.hands.length <= 1) {
           const hand = state.hands[0] || { cards: [], bet: state.currentBet };
-          els.playerLabel.textContent = "Player Hand";
+          els.playerLabel.textContent = "You";
           els.playerCards.innerHTML = hand.cards.map((card, index) => renderCard(card, index)).join("");
           els.playerScore.textContent = `Score: ${scoreText(hand.cards).replace("Score: ", "")}`;
           els.playerArea.classList.toggle("bust", scoreHand(hand.cards).bust);
@@ -991,7 +1231,7 @@
         els.playerLabel.textContent = `Split Hands - Playing ${state.activeHand + 1} of ${state.hands.length}`;
         els.playerCards.innerHTML = state.hands.map((hand, handIndex) => `
           <div class="hand ${handIndex === state.activeHand ? "active-hand" : ""} ${hand.done && scoreHand(hand.cards).bust ? "bust" : ""}">
-            <div class="label">Hand ${handIndex + 1} · Bet ${money(hand.bet)}</div>
+            <div class="label">Hand ${handIndex + 1} / Bet ${money(hand.bet)}</div>
             <div class="cards">${hand.cards.map((card, index) => renderCard(card, index)).join("")}</div>
             <div class="score">${scoreText(hand.cards)}</div>
           </div>`).join("");
@@ -1001,6 +1241,7 @@
       function canDouble() {
         const hand = active();
         return Boolean(hand)
+          && state.settings.vegasRules
           && [STATES.PLAYER_TURN, STATES.SPLIT_TURN].includes(state.mode)
           && hand.cards.length === 2
           && !hand.splitAces
@@ -1010,6 +1251,7 @@
       function canSplit() {
         const hand = active();
         return Boolean(hand)
+          && state.settings.vegasRules
           && state.mode === STATES.PLAYER_TURN
           && state.hands.length === 1
           && hand.cards.length === 2
@@ -1025,8 +1267,13 @@
         els.standBtn.disabled = !playerTurn;
         els.doubleBtn.disabled = !canDouble();
         els.splitBtn.disabled = !canSplit();
+        els.doubleBtn.classList.toggle("hidden", !state.settings.vegasRules);
+        els.splitBtn.classList.toggle("hidden", !state.settings.vegasRules);
         els.clearBtn.disabled = !betting || state.currentBet === 0;
         els.dealBtn.disabled = !betting || state.currentBet === 0;
+        els.repeatBetBtn.disabled = !betting || state.lastBet <= 0 || state.balance < state.lastBet;
+        els.halfBetBtn.disabled = !betting || state.balance <= 0;
+        els.allInBtn.disabled = !betting || state.balance <= 0;
         for (const chip of els.chips.querySelectorAll(".chip")) {
           const value = Number(chip.dataset.chip);
           chip.classList.toggle("disabled", !betting || state.balance < value);
@@ -1058,12 +1305,27 @@
         els.countBadge.classList.toggle("hidden", !state.settings.showCount);
       }
 
+      function renderChipStack() {
+        const count = Math.min(12, Math.max(0, Math.ceil(state.currentBet / 50)));
+        els.chipStack.innerHTML = Array.from({ length: count }, (_, index) =>
+          `<span class="stack-chip" style="animation-delay:${index * 18}ms"></span>`
+        ).join("");
+      }
+
+      function applyVisualSettings() {
+        document.body.classList.toggle("clean-mode", state.settings.cleanMode);
+        document.body.classList.toggle("theme-realistic", state.settings.theme === "realistic");
+        document.body.classList.toggle("theme-apple", state.settings.theme === "apple");
+      }
+
       function render() {
         els.balance.textContent = `Balance: ${money(state.balance)}`;
         renderHands();
         renderControls();
         renderStats();
         renderBadges();
+        renderChipStack();
+        applyVisualSettings();
         syncSettingsInputs(false);
       }
 
@@ -1073,17 +1335,26 @@
           els.autoStandToggle.checked = state.settings.autoStand;
           els.soundToggle.checked = state.settings.sound;
           els.deckSelect.value = String(state.settings.decks);
+          els.cleanToggle.checked = state.settings.cleanMode;
+          els.vegasToggle.checked = state.settings.vegasRules;
+          els.sessionToggle.checked = state.settings.sessionOnly;
+          els.themeSelect.value = state.settings.theme;
         } else {
           els.countToggle.checked = state.settings.showCount;
           els.autoStandToggle.checked = state.settings.autoStand;
           els.soundToggle.checked = state.settings.sound;
           els.deckSelect.value = String(state.settings.decks);
+          els.cleanToggle.checked = state.settings.cleanMode;
+          els.vegasToggle.checked = state.settings.vegasRules;
+          els.sessionToggle.checked = state.settings.sessionOnly;
+          els.themeSelect.value = state.settings.theme;
         }
       }
 
       function updateSetting(key, value) {
         state.settings[key] = value;
         if (key === "decks") createShoe();
+        if (key === "sessionOnly" && value) localStorage.removeItem(STORAGE_KEY);
         saveGame();
         render();
       }
@@ -1125,15 +1396,46 @@
       function addBet(value, chipEl) {
         if (state.mode !== STATES.BETTING || state.balance < value) return;
         initAudio();
+        const now = Date.now();
         state.balance -= value;
         state.currentBet += value;
         state.betChips.push(value);
         chipEl.classList.remove("bounce");
         void chipEl.offsetWidth;
         chipEl.classList.add("bounce");
+        document.body.classList.remove("tap-pulse");
+        void document.body.offsetWidth;
+        document.body.classList.add("tap-pulse");
         sound("chip");
         saveGame();
         render();
+        if (state.lastChipTap.value === value && now - state.lastChipTap.time < 420 && state.currentBet > 0) {
+          dealRound();
+        }
+        state.lastChipTap = { value, time: now };
+      }
+
+      function addBetAmount(amount) {
+        const value = Math.max(0, Math.min(amount, state.balance));
+        if (state.mode !== STATES.BETTING || value <= 0) return;
+        state.balance -= value;
+        state.currentBet += value;
+        state.betChips.push(value);
+        sound("chip");
+        saveGame();
+        render();
+      }
+
+      function repeatBet() {
+        addBetAmount(state.lastBet);
+      }
+
+      function halfBet() {
+        addBetAmount(Math.max(5, Math.floor(state.balance / 2)));
+      }
+
+      function allIn() {
+        addBetAmount(state.balance);
       }
 
       function removeLastChip() {
@@ -1158,6 +1460,7 @@
       async function dealRound() {
         if (state.mode !== STATES.BETTING || state.currentBet <= 0) return;
         initAudio();
+        state.lastBet = state.currentBet;
         maybeReshuffle();
         state.mode = STATES.DEALING;
         state.dealer = [];
@@ -1181,8 +1484,26 @@
           await delay(180);
         }
 
-        const playerBlackjack = scoreHand(state.hands[0].cards).blackjack;
         await checkDealerBlackjackThenContinue();
+      }
+
+      function downloadCurrentHtml() {
+        const html = `<!doctype html>\n${document.documentElement.outerHTML}`;
+        const blob = new Blob([html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "blackjack-noir-offline.html";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function copyDataUrl() {
+        const html = `<!doctype html>\n${document.documentElement.outerHTML}`;
+        const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+        await navigator.clipboard.writeText(dataUrl);
       }
 
       async function checkDealerBlackjackThenContinue() {
@@ -1238,13 +1559,13 @@
           const win = Math.floor(state.currentBet * 1.5);
           state.balance += state.currentBet + win;
           state.roundNet += win;
-          text = `BLACKJACK! +${money(win)}`;
+          text = `Blackjack +${money(win)}`;
           kind = "good";
           showBlackjackBanner();
           sound("win");
         } else {
           state.roundNet -= state.currentBet;
-          text = "DEALER BLACKJACK";
+          text = "Dealer 21";
           kind = "bad";
           sound("lose");
         }
@@ -1388,17 +1709,17 @@
 
         state.roundNet = totalNet;
         if (wins && !losses) {
-          label = `WIN +${money(totalNet)}`;
+          label = `Win +${money(totalNet)}`;
           kind = "good";
           sound("win");
         } else if (losses && !wins && !pushes) {
-          label = totalNet < 0 ? `LOSS ${money(totalNet)}` : "LOSS";
+          label = totalNet < 0 ? `Loss ${money(totalNet)}` : "Loss";
           kind = "bad";
           sound("lose");
         } else if (pushes && !wins && !losses) {
-          label = "PUSH";
+          label = "Push";
         } else {
-          label = `${totalNet >= 0 ? "NET +" : "NET "}${money(totalNet)}`;
+          label = `${totalNet >= 0 ? "Net +" : "Net "}${money(totalNet)}`;
           kind = totalNet >= 0 ? "good" : "bad";
         }
 
@@ -1453,6 +1774,9 @@
         els.betDisplay.addEventListener("click", removeLastChip);
         els.clearBtn.addEventListener("click", clearBet);
         els.dealBtn.addEventListener("click", dealRound);
+        els.repeatBetBtn.addEventListener("click", repeatBet);
+        els.halfBetBtn.addEventListener("click", halfBet);
+        els.allInBtn.addEventListener("click", allIn);
         els.hitBtn.addEventListener("click", hit);
         els.standBtn.addEventListener("click", stand);
         els.doubleBtn.addEventListener("click", doubleDown);
@@ -1463,6 +1787,10 @@
         els.autoStandToggle.addEventListener("change", () => updateSetting("autoStand", els.autoStandToggle.checked));
         els.soundToggle.addEventListener("change", () => updateSetting("sound", els.soundToggle.checked));
         els.deckSelect.addEventListener("change", () => updateSetting("decks", Number(els.deckSelect.value)));
+        els.cleanToggle.addEventListener("change", () => updateSetting("cleanMode", els.cleanToggle.checked));
+        els.vegasToggle.addEventListener("change", () => updateSetting("vegasRules", els.vegasToggle.checked));
+        els.sessionToggle.addEventListener("change", () => updateSetting("sessionOnly", els.sessionToggle.checked));
+        els.themeSelect.addEventListener("change", () => updateSetting("theme", els.themeSelect.value));
         els.exportBtn.addEventListener("click", () => {
           els.saveModalTitle.textContent = "Export Save";
           els.saveModalText.textContent = "Copy this code onto your other device, then use Import Save there.";
@@ -1516,6 +1844,41 @@
           saveGame();
           render();
         });
+        els.newSessionBtn.addEventListener("click", () => {
+          state.balance = STARTING_BALANCE;
+          state.currentBet = 0;
+          state.betChips = [];
+          state.dealer = [];
+          state.hands = [];
+          state.stats = defaultStats();
+          state.mode = STATES.BETTING;
+          createShoe();
+          saveGame();
+          render();
+          showMessage("Fresh session.");
+        });
+        els.privacyWipeBtn.addEventListener("click", async () => {
+          localStorage.removeItem(STORAGE_KEY);
+          if ("caches" in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((key) => caches.delete(key)));
+          }
+          state.balance = STARTING_BALANCE;
+          state.currentBet = 0;
+          state.betChips = [];
+          state.stats = defaultStats();
+          render();
+          showMessage("Local data wiped.");
+        });
+        els.downloadHtmlBtn.addEventListener("click", downloadCurrentHtml);
+        els.dataUrlBtn.addEventListener("click", async () => {
+          try {
+            await copyDataUrl();
+            showMessage("Data URL copied.");
+          } catch {
+            showMessage("Copy failed. Browser blocked clipboard access.");
+          }
+        });
       }
 
       function boot() {
@@ -1525,6 +1888,7 @@
         bindEvents();
         registerPwa();
         render();
+        window.setTimeout(() => els.splash.classList.add("hide"), 650);
         if (state.balance <= 0) openModal(els.gameOverModal);
       }
 

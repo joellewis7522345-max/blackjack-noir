@@ -1,0 +1,17 @@
+BLACKJACK NOIR - OFFLINE USE
+
+1. Extract this zip file.
+2. Open index.html in your browser.
+3. The game runs without a server.
+
+Notes:
+- If you open the file directly, install/offline PWA features may not activate because browsers require HTTPS for that.
+- Normal gameplay still works.
+- Fonts may fall back if the device has no internet access.
+- Use Settings -> Session Only on shared/school devices.
+- Use Settings -> Download HTML to make a one-file copy.
+
+iPhone:
+1. Send the extracted folder or zip to your iPhone using iCloud Drive, AirDrop, or Files.
+2. Open index.html from the Files app.
+3. If iPhone refuses to open the local HTML properly, use the GitHub Pages link when internet is available.
