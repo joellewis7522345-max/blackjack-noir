@@ -12,6 +12,8 @@ Notes:
 - Use Settings -> Download HTML to make a one-file copy.
 - Use Settings -> Lite Mode if the device is slow.
 - Use Settings -> Force Update if the installed app looks old.
+- Keyboard: H = Hit, S = Stand, D = Deal, C = Clear, Esc = close/reset clean mode.
+- Mobile: swipe up to hit, swipe down to stand, long-press bet to clear.
 
 iPhone:
 1. Send the extracted folder or zip to your iPhone using iCloud Drive, AirDrop, or Files.

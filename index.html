@@ -642,6 +642,36 @@
       padding: .75rem;
       margin: 10px 0;
     }
+    .offline-banner {
+      position: fixed;
+      z-index: 90;
+      left: 50%;
+      top: max(10px, env(safe-area-inset-top));
+      transform: translateX(-50%);
+      display: none;
+      padding: .55rem .9rem;
+      border-radius: 999px;
+      background: rgba(5,5,5,.86);
+      border: 1px solid rgba(243,216,121,.42);
+      color: var(--gold2);
+      font-family: var(--mono);
+      font-size: .8rem;
+      box-shadow: 0 12px 38px rgba(0,0,0,.28);
+    }
+    .offline-banner.show { display: block; }
+    .round-summary {
+      position: relative;
+      z-index: 2;
+      min-height: 32px;
+      display: grid;
+      place-items: center;
+      margin: -4px 0 8px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .88rem;
+      letter-spacing: .02em;
+    }
+    .round-summary strong { color: var(--gold2); }
     .help-box {
       color: var(--muted);
       font-family: var(--mono);
@@ -652,6 +682,43 @@
       padding: .75rem;
       margin: 10px 0;
     }
+    .history-list {
+      display: grid;
+      gap: 6px;
+      margin: 10px 0 16px;
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--muted);
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: .48rem .6rem;
+      border: 1px solid rgba(201,168,76,.14);
+      border-radius: 14px;
+      background: rgba(255,255,255,.025);
+    }
+    .theme-previews {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .theme-preview {
+      min-height: 54px;
+      border-radius: 18px;
+      border: 1px solid rgba(201,168,76,.2);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: var(--cream);
+      font-family: var(--mono);
+      font-size: .72rem;
+    }
+    .theme-preview.apple { background: linear-gradient(135deg, #111, #20251f); }
+    .theme-preview.realistic { background: linear-gradient(135deg, #082816, #14512e); }
+    .theme-preview.active { outline: 2px solid rgba(243,216,121,.62); }
     .setting small {
       color: var(--muted);
       font-family: var(--mono);
@@ -778,6 +845,7 @@
 </head>
 <body>
   <button id="cleanExitBtn" class="clean-exit">Exit Clean</button>
+  <div id="offlineBanner" class="offline-banner">Offline mode</div>
   <div id="splash" class="splash">
     <div class="splash-card">
       <div class="splash-mark">21</div>
@@ -819,6 +887,8 @@
         </div>
         <div id="playerScore" class="score">Score: 0</div>
       </section>
+
+      <div id="roundSummary" class="round-summary"></div>
 
       <section class="controls">
         <div>
@@ -878,7 +948,9 @@
     <label class="setting">Vegas rules <input id="vegasToggle" type="checkbox"></label>
     <label class="setting">Session only <input id="sessionToggle" type="checkbox"></label>
     <label class="setting">Lite mode <input id="liteToggle" type="checkbox"></label>
+    <label class="setting">Reduced motion <input id="motionToggle" type="checkbox"></label>
     <label class="setting">Auto repeat bet <input id="autoRepeatToggle" type="checkbox"></label>
+    <label class="setting">Auto deal repeat <input id="autoDealRepeatToggle" type="checkbox"></label>
     <label class="setting">Theme
       <select id="themeSelect">
         <option value="apple">Apple noir</option>
@@ -892,10 +964,24 @@
         <option value="tiny">Tiny</option>
       </select>
     </label>
+    <label class="setting">Dealer speed
+      <select id="speedSelect">
+        <option value="slow">Slow</option>
+        <option value="normal">Normal</option>
+        <option value="fast">Fast</option>
+      </select>
+    </label>
+    <div class="theme-previews">
+      <button id="applePreview" class="theme-preview apple">Apple Noir</button>
+      <button id="realisticPreview" class="theme-preview realistic">Realistic</button>
+    </div>
     <div class="help-box">
       <strong>Offline / school Wi-Fi:</strong> use Download HTML for a one-file copy. Use Force Update if the home-screen app looks stale. Session Only avoids saving progress on shared devices.
     </div>
     <div class="help-box" id="versionBox">Version loading...</div>
+    <div class="help-box" id="diagnosticsBox">Diagnostics loading...</div>
+    <h2>Round History</h2>
+    <div id="historyList" class="history-list"></div>
     <div class="sync-note">
       Saves are local to this browser. Use reset if you want a fresh run.
     </div>
@@ -905,10 +991,12 @@
       <button id="dataUrlBtn">Copy Data URL</button>
       <button id="downloadHtmlBtn">Download HTML</button>
       <button id="forceUpdateBtn">Force Update</button>
+      <button id="repairAppBtn">Repair App</button>
       <button id="resetUiBtn">Reset UI</button>
       <button id="resetStatsBtn">Reset Stats</button>
       <button id="newSessionBtn">New Session</button>
       <button id="privacyWipeBtn">Privacy Wipe</button>
+      <button id="tutorialBtn">Show Tutorial</button>
     </div>
   </aside>
 
@@ -941,13 +1029,24 @@
     </div>
   </section>
 
+  <section id="tutorialModal" class="modal" aria-modal="true">
+    <h2>Quick Table Guide</h2>
+    <p><strong>1.</strong> Tap chips to place a bet. Double-tap a chip to deal fast.</p>
+    <p><strong>2.</strong> Hit to draw. Stand to let the dealer play.</p>
+    <p><strong>3.</strong> Settings has themes, Lite Mode, offline tools, and reset controls.</p>
+    <div class="modal-actions">
+      <button id="skipTutorialBtn">Skip</button>
+      <button id="doneTutorialBtn" class="primary-btn">Done</button>
+    </div>
+  </section>
+
   <script>
     (() => {
       "use strict";
 
       const STORAGE_KEY = "blackjack-noir-save-v1";
-      const APP_VERSION = "2.0.0";
-      const CACHE_VERSION = "blackjack-noir-v5";
+      const APP_VERSION = "2.1.0";
+      const CACHE_VERSION = "blackjack-noir-v6";
       const STARTING_BALANCE = 1000;
       const RESULT_DELAY_MS = 2000;
       const SUITS = ["♠", "♥", "♦", "♣"];
@@ -982,6 +1081,8 @@
         dealBtn: document.getElementById("dealBtn"),
         chips: document.getElementById("chips"),
         resultPill: document.getElementById("resultPill"),
+        roundSummary: document.getElementById("roundSummary"),
+        offlineBanner: document.getElementById("offlineBanner"),
         banner: document.getElementById("banner"),
         sidePanel: document.getElementById("sidePanel"),
         panelBtn: document.getElementById("panelBtn"),
@@ -995,16 +1096,24 @@
         vegasToggle: document.getElementById("vegasToggle"),
         sessionToggle: document.getElementById("sessionToggle"),
         liteToggle: document.getElementById("liteToggle"),
+        motionToggle: document.getElementById("motionToggle"),
         autoRepeatToggle: document.getElementById("autoRepeatToggle"),
+        autoDealRepeatToggle: document.getElementById("autoDealRepeatToggle"),
         themeSelect: document.getElementById("themeSelect"),
         densitySelect: document.getElementById("densitySelect"),
+        speedSelect: document.getElementById("speedSelect"),
+        applePreview: document.getElementById("applePreview"),
+        realisticPreview: document.getElementById("realisticPreview"),
         versionBox: document.getElementById("versionBox"),
+        diagnosticsBox: document.getElementById("diagnosticsBox"),
+        historyList: document.getElementById("historyList"),
         exportBtn: document.getElementById("exportBtn"),
         importBtn: document.getElementById("importBtn"),
         resetStatsBtn: document.getElementById("resetStatsBtn"),
         newSessionBtn: document.getElementById("newSessionBtn"),
         privacyWipeBtn: document.getElementById("privacyWipeBtn"),
         forceUpdateBtn: document.getElementById("forceUpdateBtn"),
+        repairAppBtn: document.getElementById("repairAppBtn"),
         resetUiBtn: document.getElementById("resetUiBtn"),
         dataUrlBtn: document.getElementById("dataUrlBtn"),
         downloadHtmlBtn: document.getElementById("downloadHtmlBtn"),
@@ -1015,6 +1124,10 @@
         chipStack: document.getElementById("chipStack"),
         splash: document.getElementById("splash"),
         cleanExitBtn: document.getElementById("cleanExitBtn"),
+        tutorialBtn: document.getElementById("tutorialBtn"),
+        tutorialModal: document.getElementById("tutorialModal"),
+        skipTutorialBtn: document.getElementById("skipTutorialBtn"),
+        doneTutorialBtn: document.getElementById("doneTutorialBtn"),
         modalBackdrop: document.getElementById("modalBackdrop"),
         saveModal: document.getElementById("saveModal"),
         saveModalTitle: document.getElementById("saveModalTitle"),
@@ -1051,9 +1164,13 @@
         vegasRules: false,
         sessionOnly: false,
         liteMode: false,
+        reducedMotion: false,
         autoRepeatBet: false,
+        autoDealRepeat: false,
         theme: "apple",
-        density: "comfortable"
+        density: "comfortable",
+        dealerSpeed: "normal",
+        seenOnboarding: false
       });
 
       const state = {
@@ -1072,6 +1189,8 @@
         roundNet: 0,
         lastBet: 0,
         lastChipTap: { value: 0, time: 0 },
+        lastRoundSummary: "",
+        roundHistory: [],
         stats: defaultStats(),
         settings: defaultSettings(),
         audio: null
@@ -1091,6 +1210,7 @@
           state.balance = Number.isFinite(save.balance) ? save.balance : STARTING_BALANCE;
           state.stats = { ...defaultStats(), ...(save.stats || {}) };
           state.settings = { ...defaultSettings(), ...(save.settings || {}) };
+          state.roundHistory = Array.isArray(save.roundHistory) ? save.roundHistory.slice(0, 10) : [];
         } catch {
           state.balance = STARTING_BALANCE;
           state.stats = defaultStats();
@@ -1110,7 +1230,8 @@
           timestamp: new Date().toISOString(),
           balance: state.balance,
           stats: state.stats,
-          settings: state.settings
+          settings: state.settings,
+          roundHistory: state.roundHistory
         };
       }
 
@@ -1125,6 +1246,7 @@
         state.balance = Math.round(parsed.balance);
         state.stats = { ...defaultStats(), ...(parsed.stats || {}) };
         state.settings = { ...defaultSettings(), ...(parsed.settings || {}) };
+        state.roundHistory = Array.isArray(parsed.roundHistory) ? parsed.roundHistory.slice(0, 10) : [];
         state.currentBet = 0;
         state.betChips = [];
         state.mode = STATES.BETTING;
@@ -1384,6 +1506,16 @@
         els.statsGrid.innerHTML = items.map(([label, value]) => `<div class="stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
       }
 
+      function renderHistory() {
+        if (!state.roundHistory.length) {
+          els.historyList.innerHTML = `<div class="history-item"><span>No rounds yet</span><span>-</span></div>`;
+          return;
+        }
+        els.historyList.innerHTML = state.roundHistory.map((item) =>
+          `<div class="history-item"><span>${item.cards}</span><span>${item.result}</span></div>`
+        ).join("");
+      }
+
       function renderBadges() {
         const total = state.settings.decks * 52;
         const percent = total ? Math.round((state.shoe.length / total) * 100) : 100;
@@ -1401,12 +1533,14 @@
 
       function applyVisualSettings() {
         document.body.classList.toggle("clean-mode", state.settings.cleanMode);
-        document.body.classList.toggle("lite-mode", state.settings.liteMode);
+        document.body.classList.toggle("lite-mode", state.settings.liteMode || state.settings.reducedMotion);
         document.body.classList.toggle("theme-realistic", state.settings.theme === "realistic");
         document.body.classList.toggle("theme-apple", state.settings.theme === "apple");
         document.body.classList.toggle("density-comfortable", state.settings.density === "comfortable");
         document.body.classList.toggle("density-compact", state.settings.density === "compact");
         document.body.classList.toggle("density-tiny", state.settings.density === "tiny");
+        els.applePreview.classList.toggle("active", state.settings.theme === "apple");
+        els.realisticPreview.classList.toggle("active", state.settings.theme === "realistic");
       }
 
       function render() {
@@ -1414,16 +1548,35 @@
         renderHands();
         renderControls();
         renderStats();
+        renderHistory();
         renderBadges();
         renderChipStack();
         applyVisualSettings();
         renderVersionBox();
+        renderDiagnostics();
+        els.roundSummary.innerHTML = state.lastRoundSummary ? `<strong>${state.lastRoundSummary}</strong>` : "";
+        els.offlineBanner.classList.toggle("show", !navigator.onLine);
         syncSettingsInputs(false);
       }
 
       function renderVersionBox() {
         const mode = state.settings.sessionOnly ? "session only" : "local autosave";
         els.versionBox.textContent = `Version ${APP_VERSION} / Cache ${CACHE_VERSION} / ${mode}`;
+      }
+
+      function renderDiagnostics() {
+        const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+        const storage = (() => {
+          try {
+            localStorage.setItem("__bj_test", "1");
+            localStorage.removeItem("__bj_test");
+            return "storage ok";
+          } catch {
+            return "storage blocked";
+          }
+        })();
+        const sw = "serviceWorker" in navigator ? "sw supported" : "sw unavailable";
+        els.diagnosticsBox.textContent = `${navigator.onLine ? "online" : "offline"} / ${storage} / ${sw} / ${standalone ? "installed" : "browser"}`;
       }
 
       function syncSettingsInputs(read = true) {
@@ -1436,9 +1589,12 @@
           els.vegasToggle.checked = state.settings.vegasRules;
           els.sessionToggle.checked = state.settings.sessionOnly;
           els.liteToggle.checked = state.settings.liteMode;
+          els.motionToggle.checked = state.settings.reducedMotion;
           els.autoRepeatToggle.checked = state.settings.autoRepeatBet;
+          els.autoDealRepeatToggle.checked = state.settings.autoDealRepeat;
           els.themeSelect.value = state.settings.theme;
           els.densitySelect.value = state.settings.density;
+          els.speedSelect.value = state.settings.dealerSpeed;
         } else {
           els.countToggle.checked = state.settings.showCount;
           els.autoStandToggle.checked = state.settings.autoStand;
@@ -1448,9 +1604,12 @@
           els.vegasToggle.checked = state.settings.vegasRules;
           els.sessionToggle.checked = state.settings.sessionOnly;
           els.liteToggle.checked = state.settings.liteMode;
+          els.motionToggle.checked = state.settings.reducedMotion;
           els.autoRepeatToggle.checked = state.settings.autoRepeatBet;
+          els.autoDealRepeatToggle.checked = state.settings.autoDealRepeat;
           els.themeSelect.value = state.settings.theme;
           els.densitySelect.value = state.settings.density;
+          els.speedSelect.value = state.settings.dealerSpeed;
         }
       }
 
@@ -1466,6 +1625,7 @@
       function resetUiSettings() {
         state.settings.cleanMode = false;
         state.settings.liteMode = false;
+        state.settings.reducedMotion = false;
         state.settings.theme = "apple";
         state.settings.density = "comfortable";
         state.settings.vegasRules = false;
@@ -1488,6 +1648,28 @@
       async function forceUpdate() {
         await clearCachesAndWorkers();
         window.location.href = `${window.location.pathname}?reset-ui&v=${Date.now()}`;
+      }
+
+      async function repairApp() {
+        resetUiSettings();
+        await clearCachesAndWorkers();
+        window.location.href = `${window.location.pathname}?reset-ui&v=${Date.now()}`;
+      }
+
+      function dealerDelay() {
+        return { slow: 760, normal: 520, fast: 220 }[state.settings.dealerSpeed] || 520;
+      }
+
+      function completeTutorial() {
+        state.settings.seenOnboarding = true;
+        saveGame();
+        closeModals();
+      }
+
+      function maybeShowTutorial() {
+        if (!state.settings.seenOnboarding) {
+          window.setTimeout(() => openModal(els.tutorialModal), 900);
+        }
       }
 
       function showMessage(text) {
@@ -1709,6 +1891,12 @@
           kind = "bad";
           sound("lose");
         }
+        const dealerText = dealerBlackjack ? "21" : scoreHand(state.dealer).total;
+        const playerText = playerBlackjack ? "21" : scoreHand(state.hands[0].cards).total;
+        const compactResult = state.roundNet > 0 ? `Win +${money(state.roundNet)}` : state.roundNet < 0 ? `Loss ${money(state.roundNet)}` : "Push";
+        state.lastRoundSummary = `You ${playerText} / Dealer ${dealerText} / ${compactResult}`;
+        state.roundHistory.unshift({ cards: `You ${playerText} / Dealer ${dealerText}`, result: compactResult });
+        state.roundHistory = state.roundHistory.slice(0, 10);
         settleRoundStats(state.roundNet);
         finishRound(text, kind);
       }
@@ -1811,7 +1999,7 @@
               state.dealer.push(drawCard());
               sound("deal");
               render();
-              await delay(520);
+              await delay(dealerDelay());
             } else {
               break;
             }
@@ -1848,6 +2036,12 @@
         }
 
         state.roundNet = totalNet;
+        const playerBest = state.hands.map((hand) => scoreHand(hand.cards).total).join("/");
+        const dealerText = dealerScore.bust ? "Bust" : dealerScore.total;
+        const compactResult = totalNet > 0 ? `Win +${money(totalNet)}` : totalNet < 0 ? `Loss ${money(totalNet)}` : "Push";
+        state.lastRoundSummary = `You ${playerBest} / Dealer ${dealerText} / ${compactResult}`;
+        state.roundHistory.unshift({ cards: `You ${playerBest} / Dealer ${dealerText}`, result: compactResult });
+        state.roundHistory = state.roundHistory.slice(0, 10);
         if (wins && !losses) {
           label = `Win +${money(totalNet)}`;
           kind = "good";
@@ -1902,6 +2096,9 @@
             state.balance -= state.lastBet;
             state.currentBet = state.lastBet;
             state.betChips = [state.lastBet];
+            if (state.settings.autoDealRepeat) {
+              window.setTimeout(() => dealRound(), 260);
+            }
           }
           showMessage(state.balance <= 0 ? "Game over." : "Place your bet.");
           saveGame();
@@ -1911,6 +2108,7 @@
       }
 
       function bindEvents() {
+        let pointerStart = null;
         els.chips.addEventListener("click", (event) => {
           const chip = event.target.closest(".chip");
           if (!chip || chip.classList.contains("disabled")) return;
@@ -1936,9 +2134,14 @@
         els.vegasToggle.addEventListener("change", () => updateSetting("vegasRules", els.vegasToggle.checked));
         els.sessionToggle.addEventListener("change", () => updateSetting("sessionOnly", els.sessionToggle.checked));
         els.liteToggle.addEventListener("change", () => updateSetting("liteMode", els.liteToggle.checked));
+        els.motionToggle.addEventListener("change", () => updateSetting("reducedMotion", els.motionToggle.checked));
         els.autoRepeatToggle.addEventListener("change", () => updateSetting("autoRepeatBet", els.autoRepeatToggle.checked));
+        els.autoDealRepeatToggle.addEventListener("change", () => updateSetting("autoDealRepeat", els.autoDealRepeatToggle.checked));
         els.themeSelect.addEventListener("change", () => updateSetting("theme", els.themeSelect.value));
         els.densitySelect.addEventListener("change", () => updateSetting("density", els.densitySelect.value));
+        els.speedSelect.addEventListener("change", () => updateSetting("dealerSpeed", els.speedSelect.value));
+        els.applePreview.addEventListener("click", () => updateSetting("theme", "apple"));
+        els.realisticPreview.addEventListener("click", () => updateSetting("theme", "realistic"));
         els.exportBtn.addEventListener("click", () => {
           els.saveModalTitle.textContent = "Export Save";
           els.saveModalText.textContent = "Copy this code onto your other device, then use Import Save there.";
@@ -1989,6 +2192,8 @@
         });
         els.resetStatsBtn.addEventListener("click", () => {
           state.stats = defaultStats();
+          state.roundHistory = [];
+          state.lastRoundSummary = "";
           saveGame();
           render();
         });
@@ -1999,6 +2204,8 @@
           state.dealer = [];
           state.hands = [];
           state.stats = defaultStats();
+          state.roundHistory = [];
+          state.lastRoundSummary = "";
           state.mode = STATES.BETTING;
           createShoe();
           saveGame();
@@ -2012,12 +2219,15 @@
           state.currentBet = 0;
           state.betChips = [];
           state.stats = defaultStats();
+          state.roundHistory = [];
+          state.lastRoundSummary = "";
           state.settings = defaultSettings();
           render();
           window.location.href = `${window.location.pathname}?v=${Date.now()}`;
         });
         els.downloadHtmlBtn.addEventListener("click", downloadCurrentHtml);
         els.forceUpdateBtn.addEventListener("click", forceUpdate);
+        els.repairAppBtn.addEventListener("click", repairApp);
         els.resetUiBtn.addEventListener("click", resetUiSettings);
         els.dataUrlBtn.addEventListener("click", async () => {
           try {
@@ -2030,6 +2240,42 @@
         els.cleanExitBtn.addEventListener("click", () => {
           updateSetting("cleanMode", false);
           showMessage("Clean mode off.");
+        });
+        els.tutorialBtn.addEventListener("click", () => openModal(els.tutorialModal));
+        els.skipTutorialBtn.addEventListener("click", completeTutorial);
+        els.doneTutorialBtn.addEventListener("click", completeTutorial);
+        window.addEventListener("online", render);
+        window.addEventListener("offline", render);
+        window.addEventListener("keydown", (event) => {
+          const key = event.key.toLowerCase();
+          if (key === "escape") {
+            closeModals();
+            els.sidePanel.classList.remove("open");
+            updateSetting("cleanMode", false);
+          }
+          if (key === "h") hit();
+          if (key === "s") stand();
+          if (key === "d") dealRound();
+          if (key === "c") clearBet();
+        });
+        window.addEventListener("pointerdown", (event) => {
+          pointerStart = { x: event.clientX, y: event.clientY, time: Date.now(), target: event.target };
+        });
+        window.addEventListener("pointerup", (event) => {
+          if (!pointerStart) return;
+          const dx = event.clientX - pointerStart.x;
+          const dy = event.clientY - pointerStart.y;
+          const elapsed = Date.now() - pointerStart.time;
+          const target = pointerStart.target;
+          pointerStart = null;
+          if (target.closest("#betDisplay") && elapsed > 520) {
+            clearBet();
+            return;
+          }
+          if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx) * 1.3) {
+            if (dy < 0) hit();
+            if (dy > 0) stand();
+          }
         });
         let cornerTaps = 0;
         window.addEventListener("pointerdown", (event) => {
@@ -2058,6 +2304,7 @@
         if (params.has("reset-ui")) {
           state.settings.cleanMode = false;
           state.settings.liteMode = false;
+          state.settings.reducedMotion = false;
           state.settings.theme = "apple";
           state.settings.density = "comfortable";
           state.settings.vegasRules = false;
@@ -2073,7 +2320,9 @@
         bindEvents();
         registerPwa();
         render();
+        els.offlineBanner.classList.toggle("show", !navigator.onLine);
         window.setTimeout(() => els.splash.classList.add("hide"), 650);
+        maybeShowTutorial();
         if (state.balance <= 0) openModal(els.gameOverModal);
       }
 

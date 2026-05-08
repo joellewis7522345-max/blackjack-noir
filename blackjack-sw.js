@@ -1,4 +1,4 @@
-const CACHE_NAME = "blackjack-noir-v5";
+const CACHE_NAME = "blackjack-noir-v6";
 const ASSETS = [
   "./",
   "./index.html",

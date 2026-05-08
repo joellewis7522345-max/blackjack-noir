@@ -18,7 +18,10 @@ Enable Pages for the `main` branch from the repository settings. The app opens f
 - Lite Mode reduces visual effects for older/school laptops.
 - Density controls make the table fit better on small screens.
 - Force Update clears the PWA cache if a home-screen app looks stale.
+- Tutorial, keyboard shortcuts, and swipe gestures improve first-run/mobile use.
+- Diagnostics show storage, network, service worker, and install status.
+- Round History keeps the last 10 outcomes locally.
 
 ## Saves
 
-The app autosaves locally unless Session Only is enabled. Settings include New Session, Reset UI, Force Update, and Privacy Wipe controls.
+The app autosaves locally unless Session Only is enabled. Settings include New Session, Reset UI, Repair App, Force Update, and Privacy Wipe controls.
